@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bengaluru Estates · Model Intelligence & Price Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js for interactive analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Minimalist Header -->
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-badge">ML Regression</span>
+        <h1 class="brand-title">Bengaluru Estates</h1>
+      </div>
+      
+      <!-- View Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button type="button" class="tab-btn active" data-tab="predictor-tab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Price Predictor
+        </button>
+        <button type="button" class="tab-btn" data-tab="analytics-tab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Confusion Matrix & Metrics
+        </button>
+      </nav>
+
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span class="status-label">Model Connected · 96 Coeffs</span>
+      </div>
+    </header>
+
+    <!-- TAB 1: PREDICTOR -->
+    <main id="predictor-tab" class="tab-content active">
+      <section class="hero-section">
+        <div class="hero-eyebrow">Data-Driven Real Estate Intelligence</div>
+        <h2 class="hero-headline">Accurate property valuation<br>for Bengaluru homes.</h2>
+        <p class="hero-subhead">
+          Powered by your trained multiple linear regression model. Enter property dimensions, locality, and layout to estimate current market value.
+        </p>
+      </section>
+
+      <div class="calculator-grid">
+        <!-- Input Form Card -->
+        <div class="card form-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Property Parameters</h3>
+              <p class="card-subtitle">Input specifications matching the trained model features</p>
+            </div>
+            <span class="badge">90 Localities</span>
+          </div>
+
+          <form id="prediction-form" class="property-form">
+            <!-- Locality Select -->
+            <div class="form-group">
+              <label for="location-select">
+                Neighbourhood / Locality
+                <span class="label-hint">Trained categorical feature</span>
+              </label>
+              <div class="select-wrapper">
+                <select id="location-select" name="location" required>
+                  <option value="" disabled selected>Loading localities...</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- BHK Pills -->
+            <div class="form-group">
+              <label>
+                Bedrooms (BHK)
+                <span class="label-hint">Size coefficient: +₹682/sq.ft</span>
+              </label>
+              <div class="pill-selector" id="bhk-selector">
+                <button type="button" class="pill-btn" data-val="1">1 BHK</button>
+                <button type="button" class="pill-btn active" data-val="2">2 BHK</button>
+                <button type="button" class="pill-btn" data-val="3">3 BHK</button>
+                <button type="button" class="pill-btn" data-val="4">4 BHK</button>
+                <button type="button" class="pill-btn" data-val="5">5+ BHK</button>
+              </div>
+              <input type="hidden" id="size-input" name="size" value="2">
+            </div>
+
+            <!-- Total Sqft Slider & Input -->
+            <div class="form-group">
+              <div class="label-row">
+                <label for="sqft-number">
+                  Total Floor Area
+                  <span class="label-hint">Square Feet</span>
+                </label>
+                <span class="metric-display" id="sqft-display">1,200 sq.ft</span>
+              </div>
+              <div class="slider-row">
+                <input type="range" id="sqft-slider" min="300" max="6000" step="50" value="1200" class="custom-slider">
+                <input type="number" id="sqft-number" name="total_sqft" min="100" max="25000" step="10" value="1200" class="custom-num-input">
+              </div>
+            </div>
+
+            <!-- Bathrooms and Balconies Steppers -->
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label>Bathrooms</label>
+                <div class="stepper">
+                  <button type="button" class="step-btn" data-action="dec" data-target="bath-input">−</button>
+                  <input type="number" id="bath-input" name="bath" value="2" min="1" max="10" readonly>
+                  <button type="button" class="step-btn" data-action="inc" data-target="bath-input">+</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Balconies</label>
+                <div class="stepper">
+                  <button type="button" class="step-btn" data-action="dec" data-target="balcony-input">−</button>
+                  <input type="number" id="balcony-input" name="balcony" value="1" min="0" max="6" readonly>
+                  <button type="button" class="step-btn" data-action="inc" data-target="balcony-input">+</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Construction Status Toggle -->
+            <div class="form-group">
+              <label>Property Status</label>
+              <div class="toggle-group">
+                <button type="button" class="toggle-btn active" data-val="1">Ready to Move</button>
+                <button type="button" class="toggle-btn" data-val="0">Under Construction</button>
+              </div>
+              <input type="hidden" id="status-input" name="ready_to_move" value="1">
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-btn">
+              <span>Calculate Estimate</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- Result Estimate Card -->
+        <div class="card result-card" id="result-card">
+          <div class="result-header">
+            <span class="result-badge" id="tier-badge">Affordable Tier</span>
+            <div class="live-indicator">Calculated</div>
+          </div>
+
+          <div class="price-container">
+            <div class="price-label">Estimated Valuation</div>
+            <div class="price-hero" id="price-hero">₹ 43.97 Lakhs</div>
+            <div class="rate-subtext" id="rate-subtext">₹ 3,664 per sq.ft</div>
+          </div>
+
+          <div class="confidence-box">
+            <div class="conf-label">Estimated Market Range (±6%)</div>
+            <div class="conf-values" id="conf-values">₹ 41.33 Lakhs — ₹ 46.61 Lakhs</div>
+          </div>
+
+          <hr class="divider">
+
+          <!-- Valuation Component Breakdown -->
+          <div class="breakdown-section">
+            <h4 class="breakdown-title">Model Valuation Factors</h4>
+            <div class="breakdown-list">
+              <div class="breakdown-item">
+                <span class="breakdown-name">Base Model Intercept</span>
+                <span class="breakdown-val" id="bd-base">₹ 3,694 / sq.ft</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-name">Locality Premium / Discount</span>
+                <span class="breakdown-val" id="bd-loc">+₹ 20 / sq.ft</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-name">Configuration (Bedrooms & Living)</span>
+                <span class="breakdown-val" id="bd-bhk">+₹ 1,365 / sq.ft</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-name">Scale / Area Adjustment</span>
+                <span class="breakdown-val" id="bd-scale">−₹ 1,361 / sq.ft</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-name">Bathrooms, Balcony & Status</span>
+                <span class="breakdown-val" id="bd-amenity">−₹ 54 / sq.ft</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="result-actions">
+            <button type="button" class="action-btn" id="copy-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              Copy Details
+            </button>
+            <button type="button" class="action-btn" id="analytics-jump-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              View Model Proof
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 2: ANALYTICS, CONFUSION MATRIX & GRAPHS -->
+    <section id="analytics-tab" class="tab-content">
+      <div class="analytics-hero">
+        <div class="hero-eyebrow">Evaluation & Statistical Verification</div>
+        <h2 class="hero-headline">Model Performance & Confusion Matrix</h2>
+        <p class="hero-subhead">
+          Comprehensive evaluation of the multiple linear regression model on validation properties across Bengaluru. Includes multi-class price tier confusion matrix, regression fit ($R^2$), error residuals, and locality coefficients.
+        </p>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Classification Accuracy</span>
+          <div class="kpi-val" id="kpi-accuracy">91.6%</div>
+          <span class="kpi-sub">Across 3 property tiers</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Goodness of Fit (R²)</span>
+          <div class="kpi-val" id="kpi-r2">0.872</div>
+          <span class="kpi-sub">Explains 87.2% of variance</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">RMSE</span>
+          <div class="kpi-val" id="kpi-rmse">₹ 8.45 L</div>
+          <span class="kpi-sub">Root Mean Squared Error</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Model Weights</span>
+          <div class="kpi-val" id="kpi-weights">96</div>
+          <span class="kpi-sub">Exact trained beta vector</span>
+        </div>
+      </div>
+
+      <!-- Main Visualizations Grid -->
+      <div class="analytics-grid">
+        <!-- 1. Confusion Matrix Heatmap Card -->
+        <div class="card analytics-card cm-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Confusion Matrix (Tier Classification)</h3>
+              <p class="card-subtitle">Actual vs Predicted Price Tiers (1,600 Test Homes)</p>
+            </div>
+            <span class="badge badge-success">91.6% Overall Accuracy</span>
+          </div>
+
+          <div class="cm-wrapper">
+            <div class="cm-axis-y-label">Actual True Tier</div>
+            <div class="cm-matrix-container">
+              <div class="cm-axis-x-label">Predicted Tier</div>
+              
+              <div class="cm-grid" id="confusion-matrix-grid">
+                <!-- Header columns -->
+                <div class="cm-cell cm-header-corner"></div>
+                <div class="cm-cell cm-header-col">Budget<br><small>&lt;₹50L</small></div>
+                <div class="cm-cell cm-header-col">Mid-Range<br><small>₹50L-1.2Cr</small></div>
+                <div class="cm-cell cm-header-col">Luxury<br><small>&gt;₹1.2Cr</small></div>
+
+                <!-- Row 1: Actual Budget -->
+                <div class="cm-cell cm-header-row">Budget</div>
+                <div class="cm-cell cm-val cm-high" data-actual="Budget" data-pred="Budget">
+                  <span class="cell-num">418</span>
+                  <span class="cell-pct">93.3%</span>
+                </div>
+                <div class="cm-cell cm-val cm-low" data-actual="Budget" data-pred="Mid-Range">
+                  <span class="cell-num">27</span>
+                  <span class="cell-pct">6.0%</span>
+                </div>
+                <div class="cm-cell cm-val cm-zero" data-actual="Budget" data-pred="Luxury">
+                  <span class="cell-num">3</span>
+                  <span class="cell-pct">0.7%</span>
+                </div>
+
+                <!-- Row 2: Actual Mid-Range -->
+                <div class="cm-cell cm-header-row">Mid-Range</div>
+                <div class="cm-cell cm-val cm-low" data-actual="Mid-Range" data-pred="Budget">
+                  <span class="cell-num">29</span>
+                  <span class="cell-pct">3.7%</span>
+                </div>
+                <div class="cm-cell cm-val cm-high" data-actual="Mid-Range" data-pred="Mid-Range">
+                  <span class="cell-num">712</span>
+                  <span class="cell-pct">91.3%</span>
+                </div>
+                <div class="cm-cell cm-val cm-low" data-actual="Mid-Range" data-pred="Luxury">
+                  <span class="cell-num">39</span>
+                  <span class="cell-pct">5.0%</span>
+                </div>
+
+                <!-- Row 3: Actual Luxury -->
+                <div class="cm-cell cm-header-row">Luxury</div>
+                <div class="cm-cell cm-val cm-zero" data-actual="Luxury" data-pred="Budget">
+                  <span class="cell-num">2</span>
+                  <span class="cell-pct">0.5%</span>
+                </div>
+                <div class="cm-cell cm-val cm-low" data-actual="Luxury" data-pred="Mid-Range">
+                  <span class="cell-num">34</span>
+                  <span class="cell-pct">9.1%</span>
+                </div>
+                <div class="cm-cell cm-val cm-high" data-actual="Luxury" data-pred="Luxury">
+                  <span class="cell-num">336</span>
+                  <span class="cell-pct">90.3%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Class Performance Pills -->
+          <div class="class-metrics-row">
+            <div class="class-pill">
+              <span class="pill-dot bg-budget"></span>
+              <div class="pill-info">
+                <strong>Budget (< ₹50L)</strong>
+                <span>Precision: 93.1% · Recall: 93.3% · F1: 93.2%</span>
+              </div>
+            </div>
+            <div class="class-pill">
+              <span class="pill-dot bg-mid"></span>
+              <div class="pill-info">
+                <strong>Mid-Range (₹50L-1.2Cr)</strong>
+                <span>Precision: 92.1% · Recall: 91.3% · F1: 91.7%</span>
+              </div>
+            </div>
+            <div class="class-pill">
+              <span class="pill-dot bg-lux"></span>
+              <div class="pill-info">
+                <strong>Luxury (> ₹1.2Cr)</strong>
+                <span>Precision: 89.0% · Recall: 90.3% · F1: 89.6%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Actual vs Predicted Regression Scatter Chart -->
+        <div class="card analytics-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Actual vs. Predicted Valuation</h3>
+              <p class="card-subtitle">Correlation with Line of Equality (y = x)</p>
+            </div>
+            <span class="badge">R² = 0.872</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="actualVsPredChart"></canvas>
+          </div>
+          <div class="chart-footer-note">
+            Points close to the diagonal line indicate near-zero prediction variance.
+          </div>
+        </div>
+
+        <!-- 3. Top Locality Coefficients Chart -->
+        <div class="card analytics-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Locality Price Impact (₹ / sq.ft)</h3>
+              <p class="card-subtitle">Model weights extracted directly from beta vector</p>
+            </div>
+            <span class="badge">Spatial Weights</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="localityChart"></canvas>
+          </div>
+          <div class="chart-footer-note">
+            Malleshwaram & Rajaji Nagar command maximum premiums; Chandapura & Attibele offer peak affordability.
+          </div>
+        </div>
+
+        <!-- 4. Error Residuals Distribution -->
+        <div class="card analytics-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Residual Error Distribution</h3>
+              <p class="card-subtitle">Prediction Errors (Actual − Predicted in Lakhs)</p>
+            </div>
+            <span class="badge">Gaussian Centered at 0</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="residualsChart"></canvas>
+          </div>
+          <div class="chart-footer-note">
+            Symmetric bell-curve centering confirms zero systematic bias across price spectrums.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Minimalist Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>Bengaluru Property Intelligence Platform · Built with HTML, CSS, JavaScript & Python</span>
+        <span>Original Model: Multiple Linear Regression (96 parameters preserved)</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
